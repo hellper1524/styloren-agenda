@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Styloren's — Agenda del salón</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="site-bar">
+    <a class="wordmark" href="#inicio" data-nav="inicio">Styloren's <em>salon</em></a>
+    <nav class="main-nav" id="mainNav">
+      <button data-nav="inicio">Inicio</button>
+      <button data-nav="servicios">Servicios</button>
+      <button data-nav="equipo">Equipo</button>
+      <button data-nav="reservar">Reservar</button>
+    </nav>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- ---------------- INICIO ---------------- -->
+  <section class="view" data-view="inicio" id="view-inicio">
+    <div class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow" id="heroEyebrow">Agenda en línea · Puente Nacional</div>
+          <h1>Tu cita de belleza,<br><i>agendada en segundos.</i></h1>
+          <p class="lede">Styloren's reúne el catálogo de servicios, la disponibilidad real del salón y la confirmación de cada cita en un solo lugar — sin llamadas, sin mensajes cruzados.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-nav="reservar">Reservar una cita</button>
+            <button class="btn btn-ghost" data-nav="servicios">Ver servicios y precios</button>
+          </div>
+          <div class="hero-facts">
+            <div class="hero-fact"><b id="factServiceCount">—</b><span>servicios disponibles</span></div>
+            <div class="hero-fact"><b id="factHoursSample">—</b><span id="factHoursLabel">horario</span></div>
+            <div class="hero-fact"><b id="factOpenToday">—</b><span>hoy</span></div>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 320 320" fill="none">
+            <circle cx="160" cy="160" r="150" fill="var(--surface-2)"/>
+            <circle cx="160" cy="160" r="150" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-dasharray="2 6"/>
+            <g transform="translate(160 160)">
+              <g transform="rotate(-18)">
+                <path d="M -70 -6 L 40 -6 M -70 6 L 40 6" stroke="var(--brand)" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="-78" cy="-14" r="16" fill="none" stroke="var(--brand)" stroke-width="6"/>
+                <circle cx="-78" cy="14" r="16" fill="none" stroke="var(--brand)" stroke-width="6"/>
+                <path d="M -60 -8 L 50 -1" stroke="var(--accent)" stroke-width="6" stroke-linecap="round"/>
+              </g>
+              <g transform="translate(10 55) rotate(6)">
+                <rect x="-55" y="-8" width="110" height="16" rx="8" fill="var(--accent)"/>
+                <rect x="-55" y="-8" width="110" height="16" rx="8" fill="none" stroke="var(--brand-strong)" stroke-width="1.5" opacity=".4"/>
+              </g>
+              <g transform="translate(-6 -78)">
+                <path d="M0 0 C 26 10, 26 46, 0 56 C -26 46, -26 10, 0 0 Z" fill="var(--tag-bg)" stroke="var(--brand)" stroke-width="2"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Todo lo que necesita tu salón</h2>
+          <p>Una sola agenda para clientas y equipo: reservas, catálogo y control de citas.</p>
+        </div>
+      </div>
+      <div class="service-grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr));">
+        <div class="service-card">
+          <span class="service-cat">Para tus clientas</span>
+          <div class="service-name">Reserva 24/7</div>
+          <p style="color:var(--text-dim); font-size:.88rem; margin:0;">Eligen servicio, ven la disponibilidad real y confirman su hora sin escribirte.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-cat">Confirmación</span>
+          <div class="service-name">Al instante</div>
+          <p style="color:var(--text-dim); font-size:.88rem; margin:0;">Cada reserva queda registrada y visible de inmediato en el panel del salón.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-cat">Para tu equipo</span>
+          <div class="service-name">Panel de citas</div>
+          <p style="color:var(--text-dim); font-size:.88rem; margin:0;">Revisa lo que viene hoy y en la semana, con notas y precios editables.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ---------------- SERVICIOS ---------------- -->
+  <section class="view" data-view="servicios" id="view-servicios">
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Catálogo de servicios</h2>
+          <p>Precios y duración estimada. Elige uno para empezar tu reserva.</p>
+        </div>
+      </div>
+      <div class="chips" id="categoryChips"></div>
+      <div id="servicesEmpty" class="empty-state" style="display:none;">
+        <div class="glyph">💇</div>
+        <div>No se pudo cargar el catálogo. Verifica que el servidor esté encendido.</div>
+      </div>
+      <div class="service-grid" id="servicesGrid"></div>
+    </section>
+  </section>
+
+  <!-- ---------------- EQUIPO (visible a clientas) ---------------- -->
+  <section class="view" data-view="equipo" id="view-equipo">
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Nuestro equipo</h2>
+          <p>Las profesionales y profesionales que te van a atender en Styloren's.</p>
+        </div>
+      </div>
+      <div class="staff-grid" id="staffGrid"></div>
+      <div id="staffEmpty" class="empty-state" style="display:none;">
+        <div class="glyph">✂️</div>
+        <div>Aún no hay estilistas publicados.</div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ---------------- RESERVAR ---------------- -->
+  <section class="view" data-view="reservar" id="view-reservar">
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Reservar una cita</h2>
+          <p>Cuatro pasos: servicio, horario, tus datos y confirmación.</p>
+        </div>
+      </div>
+
+      <div class="progress-mobile" id="progressMobile">
+        <span data-step="1"></span><span data-step="2"></span><span data-step="3"></span><span data-step="4"></span>
+      </div>
+
+      <div class="booking-layout">
+        <div class="stepper" id="stepper">
+          <div class="step-item" data-step="1"><span class="num">1</span><span>Servicio</span></div>
+          <div class="step-rail"></div>
+          <div class="step-item" data-step="2"><span class="num">2</span><span>Fecha y hora</span></div>
+          <div class="step-rail"></div>
+          <div class="step-item" data-step="3"><span class="num">3</span><span>Tus datos</span></div>
+          <div class="step-rail"></div>
+          <div class="step-item" data-step="4"><span class="num">4</span><span>Confirmar</span></div>
+        </div>
+
+        <div>
+          <div class="step-panel" data-step-panel="1">
+            <h3>¿Qué te vas a hacer?</h3>
+            <p class="hint">Selecciona un servicio del catálogo.</p>
+            <div class="chips" id="bookingCategoryChips" style="margin-bottom:16px;"></div>
+            <div class="service-grid" id="bookingServiceGrid"></div>
+            <div class="step-actions"><span></span><button class="btn btn-primary" id="toStep2" disabled>Continuar</button></div>
+          </div>
+
+          <div class="step-panel" data-step-panel="2" style="display:none;">
+            <h3>Elige fecha y hora</h3>
+            <p class="hint">Horarios de <span id="hoursLabel">Styloren's</span>. Puedes elegir estilista o dejarlo sin preferencia.</p>
+            <div class="field">
+              <label for="staffSelect">Estilista (opcional)</label>
+              <select id="staffSelect"><option value="">Sin preferencia</option></select>
+            </div>
+            <div class="field">
+              <label for="dateInput">Fecha</label>
+              <input type="date" id="dateInput">
+            </div>
+            <div class="field">
+              <label>Horas disponibles</label>
+              <div class="slots" id="slotsGrid"></div>
+            </div>
+            <div class="step-actions">
+              <button class="btn btn-ghost" data-back="1">Atrás</button>
+              <button class="btn btn-primary" id="toStep3" disabled>Continuar</button>
+            </div>
+          </div>
+
+          <div class="step-panel" data-step-panel="3" style="display:none;">
+            <h3>Tus datos de contacto</h3>
+            <p class="hint">Los usamos solo para confirmar tu cita.</p>
+            <div class="field"><label for="nameInput">Nombre completo</label><input type="text" id="nameInput" placeholder="Ej. Camila Restrepo" autocomplete="name"></div>
+            <div class="field"><label for="phoneInput">Celular</label><input type="tel" id="phoneInput" placeholder="Ej. 300 123 4567" autocomplete="tel"></div>
+            <div class="step-actions">
+              <button class="btn btn-ghost" data-back="2">Atrás</button>
+              <button class="btn btn-primary" id="toStep4" disabled>Continuar</button>
+            </div>
+          </div>
+
+          <div class="step-panel" data-step-panel="4" style="display:none;">
+            <h3>Confirma tu reserva</h3>
+            <p class="hint">Revisa los datos antes de enviarla.</p>
+            <div class="summary-card" id="summaryCard"></div>
+            <div class="banner error" id="bookingError" style="display:none;"></div>
+            <div class="step-actions">
+              <button class="btn btn-ghost" data-back="3">Atrás</button>
+              <button class="btn btn-primary" id="submitBooking">Confirmar reserva</button>
+            </div>
+          </div>
+
+          <div class="step-panel confirm-screen" data-step-panel="success" style="display:none;">
+            <div class="confirm-icon">✓</div>
+            <h3>¡Reserva confirmada!</h3>
+            <p class="hint" id="successText" style="max-width:44ch; margin-left:auto; margin-right:auto;"></p>
+            <button class="btn btn-primary" id="bookAnother">Reservar otra cita</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ---------------- PANEL (equipo del salón, oculto a clientas) ---------------- -->
+  <section class="view" data-view="panel" id="view-panel">
+    <section>
+
+      <div id="adminGate" class="admin-gate">
+        <div class="glyph">🔒</div>
+        <h3>Acceso del equipo</h3>
+        <p class="hint" style="margin:8px 0 20px;">Ingresa el código del salón para ver el panel de citas.</p>
+        <div class="field"><input type="password" inputmode="numeric" id="pinInput" placeholder="••••" maxlength="12"></div>
+        <div class="banner error" id="loginError" style="display:none;"></div>
+        <button class="btn btn-primary" id="pinSubmit" style="width:100%;">Entrar</button>
+      </div>
+
+      <div id="adminContent" style="display:none;">
+        <div class="section-head">
+          <div><h2>Panel del salón</h2><p>Citas, precios, equipo y ajustes de Styloren's.</p></div>
+          <button class="btn btn-ghost btn-sm" id="logoutBtn">Cerrar sesión</button>
+        </div>
+
+        <div class="admin-subnav" id="adminSubnav">
+          <button data-tab="citas" class="active">Citas</button>
+          <button data-tab="servicios">Servicios</button>
+          <button data-tab="equipo">Equipo</button>
+          <button data-tab="ajustes">Ajustes</button>
+        </div>
+
+        <!-- CITAS -->
+        <div class="admin-tab" data-admin-tab="citas">
+          <div class="chips" id="panelFilterChips" style="margin-bottom:24px;">
+            <button class="chip active" data-filter="proximas">Próximas</button>
+            <button class="chip" data-filter="todas">Todas</button>
+          </div>
+          <div class="stat-row">
+            <div class="stat-tile"><div class="label">Citas hoy</div><div class="value" id="statToday">—</div></div>
+            <div class="stat-tile"><div class="label">Próxima cita</div><div class="value" id="statNext" style="font-size:1.3rem;">—</div><div class="sub" id="statNextSub">&nbsp;</div></div>
+            <div class="stat-tile"><div class="label">Esta semana</div><div class="value" id="statWeek">—</div><div class="sub">citas agendadas</div></div>
+          </div>
+          <div id="panelList"></div>
+          <div id="panelEmpty" class="empty-state" style="display:none;">
+            <div class="glyph">🗓️</div>
+            <div>Aún no tienes citas agendadas.</div>
+            <p style="font-size:.85rem;">Comparte el enlace de reservas con tus clientas para empezar a llenar tu agenda.</p>
+          </div>
+        </div>
+
+        <!-- SERVICIOS (editar precios) -->
+        <div class="admin-tab" data-admin-tab="servicios" style="display:none;">
+          <p class="hint" style="margin-bottom:16px;">Edita duración y precio; guarda cada fila por separado.</p>
+          <div id="manageServicesList"></div>
+          <button class="btn btn-ghost btn-sm" id="addServiceBtn" style="margin-top:8px;">+ Agregar servicio</button>
+        </div>
+
+        <!-- EQUIPO -->
+        <div class="admin-tab" data-admin-tab="equipo" style="display:none;">
+          <p class="hint" style="margin-bottom:16px;">Estilistas visibles para las clientas al reservar.</p>
+          <div id="manageStaffList"></div>
+          <button class="btn btn-ghost btn-sm" id="addStaffBtn" style="margin-top:8px;">+ Agregar estilista</button>
+        </div>
+
+        <!-- AJUSTES -->
+        <div class="admin-tab" data-admin-tab="ajustes" style="display:none;">
+          <div class="settings-card">
+            <h4>Datos del salón</h4>
+            <div class="field-row">
+              <div class="field"><label for="settingName">Nombre</label><input type="text" id="settingName"></div>
+              <div class="field"><label for="settingCity">Ciudad</label><input type="text" id="settingCity"></div>
+            </div>
+            <h4 style="margin-top:8px;">Horario de atención</h4>
+            <div id="hoursEditor"></div>
+            <div id="settingsBanner" class="banner" style="display:none;"></div>
+            <button class="btn btn-primary btn-sm" id="saveBusinessBtn">Guardar cambios</button>
+          </div>
+
+          <div class="settings-card">
+            <h4>Código de acceso del panel</h4>
+            <div class="field-row">
+              <div class="field"><label for="currentPin">Código actual</label><input type="password" id="currentPin"></div>
+              <div class="field"><label for="newPin">Código nuevo</label><input type="password" id="newPin"></div>
+            </div>
+            <div class="banner error" id="pinChangeBanner" style="display:none;"></div>
+            <button class="btn btn-primary btn-sm" id="changePinBtn">Actualizar código</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="shell footer-grid">
+    <span>Styloren's · agenda de belleza · <span id="footerCity">Puente Nacional</span></span>
+    <a href="#panel" data-nav="panel">Acceso del equipo</a>
+  </div>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

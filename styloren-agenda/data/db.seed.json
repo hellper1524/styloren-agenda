@@ -1,0 +1,26 @@
+{
+  "business": {
+    "name": "Styloren's",
+    "city": "Puente Nacional",
+    "hoursByDay": { "0": null, "1": null, "2": [9, 19], "3": [9, 19], "4": [9, 19], "5": [9, 19], "6": [9, 17] },
+    "slotMinutes": 30,
+    "adminPin": "1234"
+  },
+  "services": [
+    { "id": "corte-mujer", "name": "Corte de cabello (Mujer)", "category": "Cabello", "durationMin": 45, "priceCOP": 45000, "order": 1 },
+    { "id": "corte-hombre", "name": "Corte de cabello (Hombre)", "category": "Cabello", "durationMin": 30, "priceCOP": 25000, "order": 2 },
+    { "id": "color-completo", "name": "Color completo", "category": "Color", "durationMin": 120, "priceCOP": 150000, "order": 3 },
+    { "id": "mechas-balayage", "name": "Mechas / Balayage", "category": "Color", "durationMin": 150, "priceCOP": 220000, "order": 4 },
+    { "id": "retoque-raiz", "name": "Retoque de raíz", "category": "Color", "durationMin": 90, "priceCOP": 95000, "order": 5 },
+    { "id": "hidratacion-profunda", "name": "Hidratación profunda", "category": "Tratamientos", "durationMin": 60, "priceCOP": 70000, "order": 6 },
+    { "id": "alisado-keratina", "name": "Alisado / Keratina", "category": "Tratamientos", "durationMin": 180, "priceCOP": 280000, "order": 7 },
+    { "id": "manicure-clasica", "name": "Manicure clásica", "category": "Manos y pies", "durationMin": 45, "priceCOP": 30000, "order": 8 },
+    { "id": "pedicure-spa", "name": "Pedicure spa", "category": "Manos y pies", "durationMin": 60, "priceCOP": 45000, "order": 9 },
+    { "id": "peinado-evento", "name": "Peinado para evento", "category": "Peinados", "durationMin": 60, "priceCOP": 80000, "order": 10 }
+  ],
+  "staff": [
+    { "id": "estilista-1", "name": "Estilista 1 (edita este nombre)", "role": "Estilista general", "active": true },
+    { "id": "estilista-2", "name": "Estilista 2 (edita este nombre)", "role": "Color y tratamientos", "active": true }
+  ],
+  "appointments": []
+}
