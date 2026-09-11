@@ -22,6 +22,12 @@
   const api = {
     getBusiness: () => req("GET", "/api/business"),
     putBusiness: (data) => req("PUT", "/api/business", data),
+    putLogo: (dataUrl) => req("PUT", "/api/business/logo", { dataUrl }),
+    deleteLogo: () => req("DELETE", "/api/business/logo"),
+    getContent: () => req("GET", "/api/content"),
+    putContent: (data) => req("PUT", "/api/content", data),
+    getEmailStatus: () => req("GET", "/api/admin/email-status"),
+    sendTestEmail: (to) => req("POST", "/api/admin/test-email", { to }),
     getServices: () => req("GET", "/api/services"),
     postService: (data) => req("POST", "/api/services", data),
     putService: (id, data) => req("PUT", "/api/services/" + id, data),
@@ -42,7 +48,8 @@
 
   /* ---------------- state ---------------- */
   var DIA_NOMBRES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-  var business = { name: "Styloren's", city: "Puente Nacional", hoursByDay: {}, slotMinutes: 30 };
+  var business = { name: "Styloren's", city: "Puente Nacional", hoursByDay: {}, slotMinutes: 30, logoDataUrl: "", notifyEmail: "" };
+  var content = {};
   var services = [];
   var staffPublic = [];
   var staffAll = [];
@@ -80,12 +87,81 @@
   });
   window.addEventListener("hashchange", function () { showView(location.hash.slice(1)); });
 
-  /* ---------------- hero / negocio ---------------- */
+  /* ---------------- hero / negocio / textos ---------------- */
+
+  // Todos los textos editables. Cada clave coincide con el id del elemento en
+  // index.html, así que aplicarlos es una sola pasada.
+  var CONTENT_FIELDS = [
+    { group: "Inicio", key: "heroEyebrow", label: "Etiqueta pequeña de arriba" },
+    { group: "Inicio", key: "heroTitle", label: "Título principal (primera línea)" },
+    { group: "Inicio", key: "heroTitleItalic", label: "Título principal (segunda línea, en cursiva)" },
+    { group: "Inicio", key: "heroLede", label: "Párrafo de presentación", big: true },
+    { group: "Inicio", key: "heroPrimaryBtn", label: "Texto del botón principal" },
+    { group: "Inicio", key: "heroSecondaryBtn", label: "Texto del botón secundario" },
+    { group: "Inicio · sección de abajo", key: "homeTitle", label: "Título de la sección" },
+    { group: "Inicio · sección de abajo", key: "homeSubtitle", label: "Subtítulo de la sección", big: true },
+    { group: "Inicio · sección de abajo", key: "homeCard1Tag", label: "Tarjeta 1 · etiqueta" },
+    { group: "Inicio · sección de abajo", key: "homeCard1Title", label: "Tarjeta 1 · título" },
+    { group: "Inicio · sección de abajo", key: "homeCard1Text", label: "Tarjeta 1 · texto", big: true },
+    { group: "Inicio · sección de abajo", key: "homeCard2Tag", label: "Tarjeta 2 · etiqueta" },
+    { group: "Inicio · sección de abajo", key: "homeCard2Title", label: "Tarjeta 2 · título" },
+    { group: "Inicio · sección de abajo", key: "homeCard2Text", label: "Tarjeta 2 · texto", big: true },
+    { group: "Inicio · sección de abajo", key: "homeCard3Tag", label: "Tarjeta 3 · etiqueta" },
+    { group: "Inicio · sección de abajo", key: "homeCard3Title", label: "Tarjeta 3 · título" },
+    { group: "Inicio · sección de abajo", key: "homeCard3Text", label: "Tarjeta 3 · texto", big: true },
+    { group: "Servicios", key: "servicesTitle", label: "Título" },
+    { group: "Servicios", key: "servicesSubtitle", label: "Subtítulo", big: true },
+    { group: "Equipo", key: "teamTitle", label: "Título" },
+    { group: "Equipo", key: "teamSubtitle", label: "Subtítulo", big: true },
+    { group: "Reservar", key: "bookingTitle", label: "Título" },
+    { group: "Reservar", key: "bookingSubtitle", label: "Subtítulo", big: true },
+    { group: "Pie de página", key: "footerText", label: "Texto del pie de página" },
+  ];
+
+  // {ciudad} y {salon} se reemplazan solos, para no tener que reescribir los
+  // textos cuando cambias el nombre o la ciudad en Ajustes.
+  function fillPlaceholders(text) {
+    return String(text == null ? "" : text)
+      .replace(/\{ciudad\}/g, business.city || "")
+      .replace(/\{salon\}/g, business.name || "");
+  }
+  function applyContentToUI() {
+    CONTENT_FIELDS.forEach(function (f) {
+      var el = document.getElementById(f.key);
+      if (el && content[f.key] !== undefined) el.textContent = fillPlaceholders(content[f.key]);
+    });
+  }
+
+  function applyLogoToUI() {
+    var url = business.logoDataUrl || "";
+    var headerImg = document.getElementById("logoImg");
+    var wordmark = document.getElementById("wordmarkText");
+    var heroImg = document.getElementById("heroLogo");
+    var heroSvg = document.getElementById("heroSvg");
+    var heroArt = heroImg.parentElement;
+    if (url) {
+      headerImg.src = url; headerImg.alt = business.name;
+      headerImg.style.display = "block";
+      wordmark.style.display = "none";
+      heroImg.src = url; heroImg.style.display = "block";
+      heroSvg.style.display = "none";
+      heroArt.classList.add("has-logo");
+      document.getElementById("favicon").href = url;
+    } else {
+      headerImg.style.display = "none"; headerImg.removeAttribute("src");
+      wordmark.style.display = "";
+      heroImg.style.display = "none"; heroImg.removeAttribute("src");
+      heroSvg.style.display = "";
+      heroArt.classList.remove("has-logo");
+    }
+  }
+
   function applyBusinessToUI() {
-    document.getElementById("heroEyebrow").textContent = "Agenda en línea · " + business.city;
-    document.getElementById("footerCity").textContent = business.city;
+    document.getElementById("wordmarkName").textContent = business.name;
     document.getElementById("hoursLabel").textContent = business.name;
     document.title = business.name + " — Agenda del salón";
+    applyLogoToUI();
+    applyContentToUI();
     renderHeroFacts();
   }
   function renderHeroFacts() {
@@ -240,7 +316,7 @@
     if (!selectedDate) { grid.innerHTML = '<div class="slot-empty">Elige una fecha para ver las horas disponibles.</div>'; return; }
     var d = dateFromStr(selectedDate);
     var hrs = business.hoursByDay[d.getDay()] || business.hoursByDay[String(d.getDay())];
-    if (!hrs) { grid.innerHTML = '<div class="slot-empty">Styloren\'s permanece cerrado ese día. Elige otra fecha.</div>'; return; }
+    if (!hrs) { grid.innerHTML = '<div class="slot-empty">' + escapeHtml(business.name) + ' permanece cerrado ese día. Elige otra fecha.</div>'; return; }
     var svc = selectedService();
     var duration = svc ? svc.durationMin : 30;
     var step = business.slotMinutes || 30;
@@ -340,7 +416,7 @@
   function startPanelPolling() {
     stopPanelPolling();
     panelPollTimer = setInterval(function () {
-      if (document.getElementById("view-panel").classList.contains("active") && isAdmin) loadAdminData();
+      if (document.getElementById("view-panel").classList.contains("active") && isAdmin) refreshAppointmentsOnly();
     }, 20000);
   }
   function stopPanelPolling() { if (panelPollTimer) { clearInterval(panelPollTimer); panelPollTimer = null; } }
@@ -367,10 +443,7 @@
   }
   document.getElementById("logoutBtn").addEventListener("click", async function () {
     await api.logout().catch(function () {});
-    isAdmin = false;
-    stopPanelPolling();
-    document.getElementById("adminGate").style.display = "block";
-    document.getElementById("adminContent").style.display = "none";
+    backToGate();
   });
 
   document.querySelectorAll("#adminSubnav button").forEach(function (btn) {
@@ -380,6 +453,15 @@
     });
   });
 
+  function backToGate() {
+    isAdmin = false;
+    stopPanelPolling();
+    document.getElementById("adminGate").style.display = "block";
+    document.getElementById("adminContent").style.display = "none";
+  }
+
+  // Carga completa: se usa al entrar al panel. Vuelve a pintar todos los
+  // formularios con lo que hay guardado.
   async function loadAdminData() {
     try {
       var results = await Promise.all([api.getAppointments(), api.getStaffAll()]);
@@ -388,9 +470,23 @@
       renderPanelAppointments();
       renderManageServices();
       renderManageStaff();
+      renderContentEditor();
       fillSettingsForm();
+      refreshEmailStatus();
     } catch (e) {
-      if (e.status === 401) { isAdmin = false; document.getElementById("adminGate").style.display = "block"; document.getElementById("adminContent").style.display = "none"; }
+      if (e.status === 401) backToGate();
+    }
+  }
+
+  // Refresco automático: SOLO la lista de citas. Si volviera a pintar los
+  // formularios, borraría lo que estés escribiendo justo en ese momento
+  // (un precio, un texto, el correo de una estilista).
+  async function refreshAppointmentsOnly() {
+    try {
+      appointments = await api.getAppointments();
+      renderPanelAppointments();
+    } catch (e) {
+      if (e.status === 401) backToGate();
     }
   }
 
@@ -530,8 +626,9 @@
     var el = document.getElementById("manageStaffList");
     el.innerHTML = staffAll.map(function (s) {
       return '<div class="staff-manage-row" data-staff="' + s.id + '">' +
-        '<input type="text" data-field="name" value="' + escapeHtml(s.name) + '">' +
+        '<input type="text" data-field="name" value="' + escapeHtml(s.name) + '" placeholder="nombre">' +
         '<input type="text" data-field="role" value="' + escapeHtml(s.role || "") + '" placeholder="especialidad">' +
+        '<input type="email" data-field="email" value="' + escapeHtml(s.email || "") + '" placeholder="correo para avisos">' +
         '<label style="display:flex; align-items:center; gap:6px; font-size:.85rem;"><input type="checkbox" data-field="active" ' + (s.active ? "checked" : "") + '> activo</label>' +
         '<div style="display:flex; gap:6px;"><button class="btn btn-ghost btn-sm" data-save-staff="' + s.id + '">Guardar</button><button class="btn btn-danger btn-sm" data-del-staff="' + s.id + '">Eliminar</button></div>' +
       '</div>';
@@ -542,15 +639,16 @@
         var row = el.querySelector('.staff-manage-row[data-staff="' + id + '"]');
         var name = row.querySelector('[data-field="name"]').value;
         var role = row.querySelector('[data-field="role"]').value;
+        var email = row.querySelector('[data-field="email"]').value;
         var active = row.querySelector('[data-field="active"]').checked;
         btn.disabled = true; btn.textContent = "Guardando…";
         try {
-          await api.putStaff(id, { name: name, role: role, active: active });
+          await api.putStaff(id, { name: name, role: role, email: email, active: active });
           staffPublic = await api.getStaff();
           staffAll = await api.getStaffAll();
-          renderStaffPublic(); renderManageStaff();
+          renderStaffPublic(); renderManageStaff(); refreshEmailStatus();
           btn.textContent = "Guardado ✓";
-        } catch (e) { btn.textContent = "Error"; }
+        } catch (e) { btn.textContent = "Error"; alert(e.message || "No se pudo guardar."); }
         setTimeout(function () { btn.disabled = false; btn.textContent = "Guardar"; }, 1400);
       });
     });
@@ -569,18 +667,186 @@
     var name = prompt("Nombre del nuevo estilista:");
     if (!name) return;
     var role = prompt("Especialidad (opcional):", "") || "";
+    var email = prompt("Correo para recibir los avisos de sus citas (opcional):", "") || "";
     try {
-      await api.postStaff({ name: name, role: role });
+      await api.postStaff({ name: name, role: role, email: email.trim() });
       staffPublic = await api.getStaff();
       staffAll = await api.getStaffAll();
-      renderStaffPublic(); renderManageStaff();
+      renderStaffPublic(); renderManageStaff(); refreshEmailStatus();
     } catch (e) { alert(e.message || "No se pudo crear el estilista."); }
+  });
+
+  /* ---- Avisos en pantalla ---- */
+  function showBanner(el, kind, message, keep) {
+    el.className = "banner" + (kind ? " " + kind : "");
+    el.textContent = message;
+    el.style.display = "flex";
+    if (el._timer) clearTimeout(el._timer);
+    if (!keep) el._timer = setTimeout(function () { el.style.display = "none"; }, 4000);
+  }
+
+  /* ---- Textos de la página (pestaña Textos) ---- */
+  function renderContentEditor() {
+    var el = document.getElementById("contentEditor");
+    var groups = [];
+    CONTENT_FIELDS.forEach(function (f) {
+      var g = null;
+      for (var i = 0; i < groups.length; i++) if (groups[i].name === f.group) g = groups[i];
+      if (!g) { g = { name: f.group, fields: [] }; groups.push(g); }
+      g.fields.push(f);
+    });
+    el.innerHTML = groups.map(function (g) {
+      var fields = g.fields.map(function (f) {
+        var value = escapeHtml(content[f.key] == null ? "" : content[f.key]);
+        var input = f.big
+          ? '<textarea data-content-key="' + f.key + '">' + value + '</textarea>'
+          : '<input type="text" data-content-key="' + f.key + '" value="' + value + '">';
+        return '<div class="content-field"><label>' + escapeHtml(f.label) + '</label>' + input + '</div>';
+      }).join("");
+      return '<div class="content-group"><h4>' + escapeHtml(g.name) + '</h4>' + fields + '</div>';
+    }).join("");
+  }
+  document.getElementById("saveContentBtn").addEventListener("click", async function () {
+    var btn = this, banner = document.getElementById("contentBanner");
+    var payload = {};
+    document.querySelectorAll("[data-content-key]").forEach(function (input) {
+      payload[input.getAttribute("data-content-key")] = input.value;
+    });
+    btn.disabled = true; btn.textContent = "Guardando…";
+    try {
+      content = await api.putContent(payload);
+      applyContentToUI();
+      showBanner(banner, "success", "Textos actualizados. Ya se ven así en la página.");
+    } catch (e) {
+      showBanner(banner, "error", e.message || "No se pudieron guardar los textos.");
+    }
+    btn.disabled = false; btn.textContent = "Guardar textos";
+  });
+
+  /* ---- Logo del salón ---- */
+  var MAX_LOGO_WIDTH = 520;
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(reader.result); };
+      reader.onerror = function () { reject(new Error("No se pudo leer el archivo.")); };
+      reader.readAsDataURL(file);
+    });
+  }
+  // Reduce la imagen dentro del navegador antes de mandarla al servidor: así
+  // el logo no ocupa de más en la base de datos ni hace lenta la página.
+  function shrinkImage(dataUrl) {
+    return new Promise(function (resolve) {
+      if (dataUrl.indexOf("data:image/svg+xml") === 0) return resolve(dataUrl); // un SVG ya es liviano
+      var img = new Image();
+      img.onload = function () {
+        if (img.width <= MAX_LOGO_WIDTH) return resolve(dataUrl);
+        var scale = MAX_LOGO_WIDTH / img.width;
+        var canvas = document.createElement("canvas");
+        canvas.width = MAX_LOGO_WIDTH;
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = function () { resolve(dataUrl); };
+      img.src = dataUrl;
+    });
+  }
+  function renderLogoPreview() {
+    var box = document.getElementById("logoPreview");
+    box.innerHTML = business.logoDataUrl
+      ? '<img src="' + escapeHtml(business.logoDataUrl) + '" alt="Logo actual">'
+      : '<span>Sin logo</span>';
+  }
+  document.getElementById("logoPickBtn").addEventListener("click", function () {
+    document.getElementById("logoFile").click();
+  });
+  document.getElementById("logoFile").addEventListener("change", async function () {
+    var file = this.files && this.files[0];
+    this.value = "";
+    if (!file) return;
+    var banner = document.getElementById("logoBanner");
+    if (file.size > 6 * 1024 * 1024) {
+      showBanner(banner, "error", "Esa imagen pesa demasiado (el máximo son 6 MB).");
+      return;
+    }
+    showBanner(banner, "", "Procesando la imagen…", true);
+    try {
+      var dataUrl = await shrinkImage(await readFileAsDataUrl(file));
+      business = Object.assign(business, await api.putLogo(dataUrl));
+      applyLogoToUI();
+      renderLogoPreview();
+      showBanner(banner, "success", "Logo actualizado. Ya aparece arriba de la página.");
+    } catch (e) {
+      showBanner(banner, "error", e.message || "No se pudo subir el logo.");
+    }
+  });
+  document.getElementById("logoRemoveBtn").addEventListener("click", async function () {
+    var banner = document.getElementById("logoBanner");
+    if (!business.logoDataUrl) { showBanner(banner, "", "Todavía no hay ningún logo puesto."); return; }
+    if (!confirm("¿Quitar el logo y volver al nombre escrito?")) return;
+    try {
+      business = Object.assign(business, await api.deleteLogo());
+      applyLogoToUI();
+      renderLogoPreview();
+      showBanner(banner, "success", "Logo eliminado.");
+    } catch (e) {
+      showBanner(banner, "error", e.message || "No se pudo quitar el logo.");
+    }
+  });
+
+  /* ---- Avisos por correo ---- */
+  async function refreshEmailStatus() {
+    var el = document.getElementById("emailStatus");
+    if (!el) return;
+    try {
+      var st = await api.getEmailStatus();
+      if (!st.configured) {
+        el.className = "banner";
+        el.textContent = "⚠️ No se están enviando avisos por correo. " + (st.problem || "")
+          + " La agenda funciona igual; para activar los avisos hay que configurar el correo en el servidor (está explicado en el README).";
+      } else {
+        var faltan = st.activeStaff - st.staffWithEmail;
+        el.className = "banner success";
+        el.textContent = "✓ Avisos activos vía " + st.provider + "."
+          + (faltan > 0 ? " Ojo: " + faltan + (faltan === 1 ? " estilista activa todavía no tiene" : " estilistas activas todavía no tienen") + " correo — agrégalo en la pestaña Equipo." : "");
+      }
+    } catch (e) {
+      el.className = "banner";
+      el.textContent = "No se pudo consultar el estado del correo.";
+    }
+  }
+  document.getElementById("saveNotifyEmailBtn").addEventListener("click", async function () {
+    var banner = document.getElementById("emailBanner");
+    var value = document.getElementById("settingNotifyEmail").value.trim();
+    try {
+      business = Object.assign(business, await api.putBusiness({ notifyEmail: value }));
+      showBanner(banner, "success", value ? "Correo del salón guardado." : "Se quitó el correo del salón.");
+      refreshEmailStatus();
+    } catch (e) {
+      showBanner(banner, "error", e.message || "No se pudo guardar el correo.");
+    }
+  });
+  document.getElementById("sendTestEmailBtn").addEventListener("click", async function () {
+    var btn = this, banner = document.getElementById("emailBanner");
+    var to = document.getElementById("testEmailTo").value.trim() || document.getElementById("settingNotifyEmail").value.trim();
+    if (!to) { showBanner(banner, "error", "Escribe a qué correo quieres que llegue la prueba."); return; }
+    btn.disabled = true; btn.textContent = "Enviando…";
+    try {
+      await api.sendTestEmail(to);
+      showBanner(banner, "success", "Correo de prueba enviado a " + to + ". Revisa la bandeja de entrada (y la carpeta de spam, por si acaso).", true);
+    } catch (e) {
+      showBanner(banner, "error", e.message || "No se pudo enviar el correo de prueba.", true);
+    }
+    btn.disabled = false; btn.textContent = "Enviar prueba";
   });
 
   /* ---- Ajustes (negocio + horario + pin) ---- */
   function fillSettingsForm() {
     document.getElementById("settingName").value = business.name;
     document.getElementById("settingCity").value = business.city;
+    document.getElementById("settingNotifyEmail").value = business.notifyEmail || "";
+    renderLogoPreview();
     renderHoursEditor();
   }
   function renderHoursEditor() {
@@ -634,10 +900,11 @@
   /* ---------------- boot ---------------- */
   async function boot() {
     try {
-      var results = await Promise.all([api.getBusiness(), api.getServices(), api.getStaff()]);
+      var results = await Promise.all([api.getBusiness(), api.getContent(), api.getServices(), api.getStaff()]);
       business = Object.assign(business, results[0]);
-      services = results[1];
-      staffPublic = results[2];
+      content = results[1] || {};
+      services = results[2];
+      staffPublic = results[3];
       applyBusinessToUI();
       renderServiceCategories();
       renderServicesGrid();

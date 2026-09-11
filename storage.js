@@ -26,8 +26,36 @@ const usingMongo = () => Boolean(MONGODB_URI);
 function readSeed() {
   const raw = fs.existsSync(SEED_PATH)
     ? fs.readFileSync(SEED_PATH, "utf8")
-    : JSON.stringify({ business: {}, services: [], staff: [], appointments: [] }, null, 2);
+    : JSON.stringify({ business: {}, content: {}, services: [], staff: [], appointments: [] }, null, 2);
   return JSON.parse(raw);
+}
+
+// ---------------------------------------------------------------------------
+// Migración automática
+//
+// Cuando agregamos campos nuevos (el logo, los textos editables, el correo de
+// cada estilista...), las bases de datos que ya existen no los tienen. Esto
+// completa lo que falte con los valores de la plantilla, SIN tocar nada de lo
+// que ya esté guardado. Así nadie pierde sus citas ni sus precios al
+// actualizar el código.
+// ---------------------------------------------------------------------------
+function normalizeDb(data) {
+  const seed = readSeed();
+  const db = data && typeof data === "object" ? data : {};
+
+  db.business = Object.assign({}, seed.business, db.business || {});
+  db.content = Object.assign({}, seed.content, db.content || {});
+  if (!Array.isArray(db.services)) db.services = seed.services;
+  if (!Array.isArray(db.staff)) db.staff = seed.staff;
+  if (!Array.isArray(db.appointments)) db.appointments = [];
+
+  // Campos nuevos por estilista.
+  db.staff.forEach((member) => {
+    if (member.email === undefined) member.email = "";
+    if (member.active === undefined) member.active = true;
+  });
+
+  return db;
 }
 
 // ---------------------------------------------------------------------------
@@ -87,7 +115,8 @@ async function saveMongo(data) {
 // Interfaz única que usa server.js
 // ---------------------------------------------------------------------------
 async function loadDb() {
-  return usingMongo() ? loadMongo() : loadLocal();
+  const data = usingMongo() ? await loadMongo() : loadLocal();
+  return normalizeDb(data);
 }
 async function saveDb(data) {
   return usingMongo() ? saveMongo(data) : saveLocal(data);

@@ -4,7 +4,35 @@
     "city": "Puente Nacional",
     "hoursByDay": { "0": null, "1": null, "2": [9, 19], "3": [9, 19], "4": [9, 19], "5": [9, 19], "6": [9, 17] },
     "slotMinutes": 30,
-    "adminPin": "1234"
+    "adminPin": "1234",
+    "logoDataUrl": "",
+    "notifyEmail": ""
+  },
+  "content": {
+    "heroEyebrow": "Agenda en línea · {ciudad}",
+    "heroTitle": "Tu cita de belleza,",
+    "heroTitleItalic": "agendada en segundos.",
+    "heroLede": "Styloren's reúne el catálogo de servicios, la disponibilidad real del salón y la confirmación de cada cita en un solo lugar — sin llamadas, sin mensajes cruzados.",
+    "heroPrimaryBtn": "Reservar una cita",
+    "heroSecondaryBtn": "Ver servicios y precios",
+    "homeTitle": "Todo lo que necesita tu salón",
+    "homeSubtitle": "Una sola agenda para clientas y equipo: reservas, catálogo y control de citas.",
+    "homeCard1Tag": "Para tus clientas",
+    "homeCard1Title": "Reserva 24/7",
+    "homeCard1Text": "Eligen servicio, ven la disponibilidad real y confirman su hora sin escribirte.",
+    "homeCard2Tag": "Confirmación",
+    "homeCard2Title": "Al instante",
+    "homeCard2Text": "Cada reserva queda registrada y visible de inmediato en el panel del salón.",
+    "homeCard3Tag": "Para tu equipo",
+    "homeCard3Title": "Panel de citas",
+    "homeCard3Text": "Revisa lo que viene hoy y en la semana, con notas y precios editables.",
+    "servicesTitle": "Catálogo de servicios",
+    "servicesSubtitle": "Precios y duración estimada. Elige uno para empezar tu reserva.",
+    "teamTitle": "Nuestro equipo",
+    "teamSubtitle": "Las profesionales y profesionales que te van a atender en Styloren's.",
+    "bookingTitle": "Reservar una cita",
+    "bookingSubtitle": "Cuatro pasos: servicio, horario, tus datos y confirmación.",
+    "footerText": "Styloren's · agenda de belleza · {ciudad}"
   },
   "services": [
     { "id": "corte-mujer", "name": "Corte de cabello (Mujer)", "category": "Cabello", "durationMin": 45, "priceCOP": 45000, "order": 1 },
@@ -19,8 +47,8 @@
     { "id": "peinado-evento", "name": "Peinado para evento", "category": "Peinados", "durationMin": 60, "priceCOP": 80000, "order": 10 }
   ],
   "staff": [
-    { "id": "estilista-1", "name": "Estilista 1 (edita este nombre)", "role": "Estilista general", "active": true },
-    { "id": "estilista-2", "name": "Estilista 2 (edita este nombre)", "role": "Color y tratamientos", "active": true }
+    { "id": "estilista-1", "name": "Estilista 1 (edita este nombre)", "role": "Estilista general", "email": "", "active": true },
+    { "id": "estilista-2", "name": "Estilista 2 (edita este nombre)", "role": "Color y tratamientos", "email": "", "active": true }
   ],
   "appointments": []
 }
